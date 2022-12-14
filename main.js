@@ -23,7 +23,9 @@ const showError = (input, msg) => {
 
 const clearError = input => {
 	const formBox = input.parentElement
+	const errorMsg = formBox.querySelector('.error-text')
 	formBox.classList.remove('error')
+	errorMsg.textContent = 'error'
 }
 
 const clearForm = () => {
@@ -50,13 +52,26 @@ const checkLength = (input, min) => {
 	}
 }
 
+const checkPassRegexp = pass => {
+	const regexp = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/) // min 1 uppercase, min 1 lowercase, min 1 digit, min 1 special char, min lenght 8
+
+	if (!pass.value.match(regexp)) {
+		showError(
+			pass,
+			'Hasło musi zawierać minium 1 dużą literę, 1 małą literę, 1 liczbę, 1 znak specjalny oraz minimalną długość 8 znaków.'
+		)
+	} else {
+		clearError(pass)
+	}
+}
+
 const checkPass = (pass1, pass2) => {
 	if (pass1.value !== pass2.value) {
 		showError(pass2, 'Hasła do siebie nie pasują!')
 	}
 }
 
-const checkEmail = email => {
+const checkEmailRegexp = email => {
 	const regexp = new RegExp(
 		/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 	)
@@ -80,17 +95,15 @@ const checkErrors = () => {
 	if (errorCount === 0) {
 		popup.classList.add('show-popup')
 	}
-
-	console.log(errorCount)
 }
 
 submitBtn.addEventListener('click', e => {
 	e.preventDefault()
 	checkForm()
 	checkLength(username, 3)
-	checkLength(pass, 8)
+	checkPassRegexp(pass)
 	checkPass(pass, pass2)
-	checkEmail(email)
+	checkEmailRegexp(email)
 	checkErrors()
 })
 
@@ -102,4 +115,5 @@ clearBtn.addEventListener('click', e => {
 closeBtn.addEventListener('click', e => {
 	e.preventDefault()
 	popup.classList.remove('show-popup')
+	clearForm()
 })
